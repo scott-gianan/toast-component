@@ -1,44 +1,40 @@
 //reacc
 import React from "react";
-import { useState } from "react";
+import { useState, createContext, useId } from "react";
 //components
 import Button from "../Button";
 import Toast from "../Toast/Toast";
+import ToastShelf from "../ToastShelf/ToastShelf";
 //styles
 import styles from "./ToastPlayground.module.css";
 // constants
+export const ToastContext = createContext();
 const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
-function RadioButton({ variant, setVariant }) {
-  return VARIANT_OPTIONS.map((option, index) => {
-    return (
-      <label htmlFor={`variant-${option}`} key={index}>
-        <input
-          id={`variant-${option}`}
-          type="radio"
-          name="variant"
-          value={option}
-          checked={option === variant}
-          onChange={(event) => setVariant(event.target.value)}
-        />
-        {option}
-      </label>
-    );
-  });
-}
+
 function ToastPlayground() {
   const [message, setMessage] = useState("");
   const [variant, setVariant] = useState("");
-  const [showToast, setShowToast] = useState(false);
+  //const [showToast, setShowToast] = useState(true);
+  const [toasts, setToasts] = useState([]);
+  const toastId = useId();
   const handleMessageOnChange = (event) => {
     setMessage((prevMessage) => event.target.value);
   };
   const handleToast = () => {
-    setShowToast(!showToast);
-    setVariant(() => {
-      if (!variant) {
+    setMessage("");
+    setVariant((prevVariant) => {
+      if (!prevVariant) {
         return "notice";
       }
       return variant;
+    });
+    setToasts((prevToasts) => {
+      const addedToast = {
+        id: `${toastId}-${toasts.length}`,
+        message,
+        variant: variant || "notice",
+      };
+      return [...prevToasts, addedToast];
     });
   };
   return (
@@ -47,15 +43,10 @@ function ToastPlayground() {
         <img alt="Cute toast mascot" src="/toast.png" />
         <h1>Toast Playground</h1>
       </header>
-      {/* start of text input */}
-      {showToast && (
-        <Toast
-          message={message}
-          toastVariant={variant}
-          isToastShown={showToast}
-          setIsToastShown={setShowToast}
-        />
-      )}
+      <ToastContext.Provider value={{ setToasts }}>
+        <ToastShelf shelf={toasts} />
+      </ToastContext.Provider>
+
       <div className={styles.controlsWrapper}>
         <div className={styles.row}>
           <label
@@ -78,9 +69,7 @@ function ToastPlayground() {
         <div className={styles.row}>
           <div className={styles.label}>Variant</div>
           <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
-            {/* render radio checkbox here */}
             <RadioButton variant={variant} setVariant={setVariant} />
-            {/* delete this above */}
           </div>
         </div>
 
@@ -96,3 +85,21 @@ function ToastPlayground() {
 }
 
 export default ToastPlayground;
+
+function RadioButton({ variant, setVariant }) {
+  return VARIANT_OPTIONS.map((option, index) => {
+    return (
+      <label htmlFor={`variant-${option}`} key={index}>
+        <input
+          id={`variant-${option}`}
+          type="radio"
+          name="variant"
+          value={option}
+          checked={option === variant}
+          onChange={(event) => setVariant(event.target.value)}
+        />
+        {option}
+      </label>
+    );
+  });
+}

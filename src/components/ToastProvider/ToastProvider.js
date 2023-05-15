@@ -1,5 +1,7 @@
 //react
-import { useState, useId, createContext, useEffect } from "react";
+import { useState, useId, createContext } from "react";
+//custom hooks
+import useKeyDown from "../../hooks/use-keydown";
 //constants
 export const ToastContext = createContext();
 
@@ -40,18 +42,9 @@ function ToastProvider({ children }) {
     handleMessage,
     handlePopToast,
   };
-  useEffect(() => {
-    const handleDismissToast = (event) => {
-      const pressedKey = event.key;
-      if (pressedKey === `Escape`) {
-        setToasts([]);
-      }
-    };
-    window.addEventListener("keydown", handleDismissToast);
-    return () => {
-      window.removeEventListener("keydown", handleDismissToast);
-    };
-  }, []);
+  useKeyDown("Space", () => {
+    setToasts([]);
+  });
   return (
     <ToastContext.Provider value={toastContext}>
       {children}

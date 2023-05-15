@@ -22,26 +22,27 @@ const ICONS_BY_VARIANT = {
 };
 
 function Toast({ message, variant, id }) {
-  const toastRef = useRef();
+  const Icon = ICONS_BY_VARIANT[variant];
   const { setToasts } = useContext(ToastContext);
-  const handleToastDelete = () => {
+  const handleToastDelete = (id) => {
     setToasts((prevToasts) => {
       return prevToasts.filter((toast) => {
-        return toast.id !== toastRef.current.id;
+        return toast.id !== id;
       });
     });
   };
   return (
-    <div
-      className={`${styles.toast} ${styles[variant]}`}
-      ref={toastRef}
-      id={id}
-    >
+    <div className={`${styles.toast} ${styles[variant]}`}>
       <div className={styles.iconContainer}>
-        <Info size={24} />
+        <Icon size={24} />
       </div>
       <p className={styles.content}>{message}</p>
-      <button className={styles.closeButton} onClick={handleToastDelete}>
+      <button
+        className={styles.closeButton}
+        onClick={() => {
+          handleToastDelete(id);
+        }}
+      >
         <X size={24} />
         <VisuallyHidden>Dismiss message</VisuallyHidden>
       </button>

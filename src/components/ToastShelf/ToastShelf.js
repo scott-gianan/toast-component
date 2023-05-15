@@ -1,15 +1,13 @@
 import React from "react";
-import { useId } from "react";
 import Toast from "../Toast";
 import styles from "./ToastShelf.module.css";
 
 function ToastShelf({ shelf }) {
-  console.log(shelf);
   return (
     <ol className={styles.wrapper}>
       {shelf.map((toast, index) => {
         return (
-          <li className={styles.toastWrapper} key={index}>
+          <li className={styles.toastWrapper} key={toast.id}>
             <Toast
               message={toast.message}
               variant={toast.variant}
